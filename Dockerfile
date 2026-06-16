@@ -20,6 +20,7 @@ RUN pip install --no-cache-dir --user -r requirements.txt
 
 
 # --- Stage 2: Final lightweight runtime ---
+# --- Stage 2: Final lightweight runtime ---
 FROM python:3.14-slim AS runner
 
 WORKDIR /app
@@ -27,15 +28,12 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Copy installed dependencies from the builder stage
 COPY --from=builder /root/.local /root/.local
-COPY . .
 
-# Update PATH to include user-installed binaries
+# Instead of COPY . ., copy only your specific code folder
+COPY ./src ./src 
+
 ENV PATH=/root/.local/bin:$PATH
+EXPOSE 8000
 
-# Expose your application's port (e.g., 3000 for FastAPI/Flask)
-EXPOSE 3000
-
-# Run the application (Change this to your specific framework command)
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3000"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
