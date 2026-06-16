@@ -20,20 +20,20 @@ RUN pip install --no-cache-dir --user -r requirements.txt
 
 
 # --- Stage 2: Final lightweight runtime ---
-# --- Stage 2: Final lightweight runtime ---
 FROM python:3.14-slim AS runner
 
 WORKDIR /app
 
-ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONTONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 COPY --from=builder /root/.local /root/.local
 
-# Instead of COPY . ., copy only your specific code folder
-COPY ./src ./src 
+# Copy everything from your local directory into the container's /app directory
+COPY . .
 
 ENV PATH=/root/.local/bin:$PATH
 EXPOSE 8000
 
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# UPDATE THIS: Change "main.py" to whatever your main Python file is called
+CMD ["python", "app.py"]
