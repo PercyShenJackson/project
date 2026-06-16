@@ -1,0 +1,41 @@
+{
+  "username": "cs_master",
+  "xp": 327672147483647,
+  "completed_modules": [
+    "ai_ml_intro",
+    "ai_neural",
+    "cloud_containers",
+    "cloud_k8s",
+    "db_sql",
+    "db_nosql",
+    "net_tcpip",
+    "net_dns",
+    "os_processes",
+    "os_memory",
+    "sec_crypto",
+    "sec_network",
+    "web_html",
+    "web_css",
+    "web_js"
+  ],
+  "streak": 327672147483648,
+  "last_login": "2026-06-16",
+  "achievements": [
+    "first_lesson",
+    "xp_500",
+    "first_branch",
+    "xp_2000",
+    "streak_3",
+    "streak_7"
+  ],
+  "coding_history": [
+    {
+      "code": "",
+      "timestamp": "2026-06-15T00:45:55.713600"
+    },
+    {
+      "code": "print(\"Hello CS!\")",
+      "timestamp": "2026-06-15T00:46:10.961022"
+    }
+  ]
+}

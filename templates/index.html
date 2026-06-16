@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS Zero‑to‑Hero Academy</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --accent: #3b82f6;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .sidebar {
+            width: 280px;
+            background: #0b1120;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            border-right: 1px solid #1e293b;
+            overflow-y: auto;
+        }
+        .sidebar h2 { color: var(--accent); font-size: 1.2rem; }
+        .branch-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .branch-item {
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s;
+        }
+        .branch-item:hover, .branch-item.active {
+            background: var(--surface);
+        }
+        .branch-icon { font-size: 1.5rem; }
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .topbar {
+            padding: 15px 20px;
+            background: #111827;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1e293b;
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+        .content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            gap: 20px;
+        }
+        .lesson-panel {
+            flex: 2;
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .side-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 15px;
+        }
+        .module-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .module-item {
+            padding: 10px;
+            background: #0f172a;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .module-item:hover { background: #1e293b; }
+        .module-item.completed {
+            border-left: 4px solid var(--success);
+        }
+        .module-item.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn {
+            padding: 8px 16px;
+            background: var(--accent);
+            border: none;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+        .quiz-option {
+            padding: 10px;
+            background: #0f172a;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .quiz-option:hover { background: #1e293b; }
+        .quiz-option.selected { background: var(--accent); }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #334155;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin: 2px;
+        }
+        textarea {
+            width: 100%;
+            background: #0f172a;
+            color: var(--text);
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 10px;
+            font-family: monospace;
+            resize: vertical;
+        }
+        pre { background: #0f172a; padding: 10px; border-radius: 6px; overflow-x: auto; }
+        code { color: #fbbf24; }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h2>🧠 CS Academy</h2>
+        <div>
+            <div class="stat-value" id="xpDisplay">0</div>
+            <div class="stat-label">XP</div>
+        </div>
+        <div id="rankDisplay" class="badge">Novice</div>
+        <nav>
+            <ul class="branch-list" id="branchList"></ul>
+        </nav>
+    </aside>
+
+    <!-- Main -->
+    <div class="main">
+        <header class="topbar">
+            <h1 id="branchTitle">Select a Branch</h1>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="streakCount">0</div>
+                    <div class="stat-label">🔥 Streak</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="completedCount">0</div>
+                    <div class="stat-label">✅ Modules</div>
+                </div>
+            </div>
+        </header>
+        <div class="content">
+            <div class="lesson-panel" id="lessonPanel">
+                <p>Select a module from the right panel to start learning.</p>
+            </div>
+            <div class="side-panel">
+                <div class="card">
+                    <h3>Modules</h3>
+                    <ul class="module-list" id="moduleList"></ul>
+                </div>
+                <div class="card" id="sandboxCard">
+                    <h3>💻 Coding Sandbox</h3>
+                    <textarea id="codeInput" rows="5" placeholder="print('Hello, CS!')"></textarea>
+                    <button class="btn" onclick="runCode()">Run ▶</button>
+                    <pre id="codeOutput" style="margin-top:10px;"></pre>
+                </div>
+                <div class="card" id="achievementsCard">
+                    <h3>🏅 Badges</h3>
+                    <div id="achievementsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let currentBranch = null;
+        let currentModuleId = null;
+        let progress = {};
+        let branches = {};
+        let ALL_ACHIEVEMENTS = [];   // Will be loaded from /api/achievements
+
+        // ---------- API calls ----------
+        const fetchAchievements = async () => {
+            try {
+                const res = await fetch('/api/achievements');
+                ALL_ACHIEVEMENTS = await res.json();
+            } catch (e) {
+                console.error('Could not load achievements', e);
+            }
+        }
+
+        const fetchBranches = async () => {
+            const res = await fetch('/api/branches');
+            branches = await res.json();
+            renderBranchList();
+        }
+
+        const fetchProgress = async () => {
+            const res = await fetch('/api/progress');
+            progress = await res.json();
+            updateStats();                 // Updates dashboard immediately
+            if (currentBranch) renderModules(currentBranch);
+        }
+
+        const loadLesson = async (moduleId) => {
+            const res = await fetch(`/api/lesson/${moduleId}`);
+            const lesson = await res.json();
+            if (lesson.error) {
+                document.getElementById('lessonPanel').innerHTML = `<p style="color:red;">${lesson.error}</p>`;
+                return;
+            }
+            currentModuleId = moduleId;
+            document.getElementById('lessonPanel').innerHTML = `
+                <h2>${lesson.title}</h2>
+                ${lesson.lesson}
+                <hr>
+                <h3>Quiz</h3>
+                <div id="quizContainer"></div>
+                <button class="btn" onclick="submitQuiz()">Submit Quiz</button>
+                <div id="quizResult"></div>
+                <hr>
+                <button class="btn" onclick="completeModule('${lesson.id}')">✅ Mark as Completed</button>
+            `;
+            // Render quiz options
+            const quizContainer = document.getElementById('quizContainer');
+            lesson.quiz.forEach((q, qi) => {
+                const qDiv = document.createElement('div');
+                qDiv.innerHTML = `<p><strong>${qi+1}. ${q.q}</strong></p>`;
+                const optsDiv = document.createElement('div');
+                optsDiv.className = 'quiz-options';
+                q.options.forEach((opt, oi) => {
+                    const optDiv = document.createElement('div');
+                    optDiv.className = 'quiz-option';
+                    optDiv.textContent = opt;
+                    optDiv.onclick = () => {
+                        // Deselect others in same question
+                        optsDiv.querySelectorAll('.quiz-option').forEach(el => el.classList.remove('selected'));
+                        optDiv.classList.add('selected');
+                        // Store answer index
+                        optDiv.dataset.answerIndex = oi;
+                    };
+                    optsDiv.appendChild(optDiv);
+                });
+                qDiv.appendChild(optsDiv);
+                quizContainer.appendChild(qDiv);
+            });
+        }
+
+        const completeModule = async (moduleId) => {
+            const res = await fetch(`/api/complete/${moduleId}`, { method: 'POST' });
+            const data = await res.json();
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+            progress = data.progress;
+            updateStats();
+            renderModules(currentBranch);
+        }
+
+        const submitQuiz = async () => {
+            if (!currentModuleId) return;
+            const answers = [];
+            document.querySelectorAll('.quiz-options').forEach(optsDiv => {
+                const selected = optsDiv.querySelector('.selected');
+                answers.push(selected ? parseInt(selected.dataset.answerIndex) : -1);
+            });
+            const res = await fetch(`/api/quiz/${currentModuleId}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ answers })
+            });
+            const data = await res.json();
+            document.getElementById('quizResult').innerHTML = `
+                <p>Score: ${data.score}/${data.total} — +${data.xp_earned} XP</p>
+            `;
+            progress = data.progress;
+            updateStats();
+        }
+
+        const runCode = async () => {
+            const code = document.getElementById('codeInput').value;
+            const res = await fetch('/api/execute', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ code })
+            });
+            const data = await res.json();
+            document.getElementById('codeOutput').textContent = data.output;
+        }
+
+        // ---------- Rendering ----------
+        const renderBranchList = () => {
+            const list = document.getElementById('branchList');
+            list.innerHTML = '';
+            Object.entries(branches).forEach(([bid, b]) => {
+                const li = document.createElement('li');
+                li.className = 'branch-item';
+                li.innerHTML = `${b.icon} ${b.name}`;
+                li.onclick = () => {
+                    currentBranch = bid;
+                    document.querySelectorAll('.branch-item').forEach(el => el.classList.remove('active'));
+                    li.classList.add('active');
+                    document.getElementById('branchTitle').textContent = b.name;
+                    renderModules(bid);
+                };
+                list.appendChild(li);
+            });
+        }
+
+        const renderModules = (bid) => {
+            const b = branches[bid];
+            const list = document.getElementById('moduleList');
+            list.innerHTML = '';
+            b.modules.forEach(m => {
+                const completed = progress.completed_modules?.includes(m.id);
+                const unlocked = m.prerequisites.every(pr => progress.completed_modules?.includes(pr));
+                const li = document.createElement('li');
+                li.className = 'module-item' + (completed ? ' completed' : '') + (!unlocked ? ' locked' : '');
+                li.innerHTML = `
+                    <strong>${m.title}</strong>
+                    <span style="float:right;color:var(--muted)">${m.xp} XP</span>
+                    ${completed ? ' ✅' : (!unlocked ? ' 🔒' : '')}
+                `;
+                if (unlocked || completed) {
+                    li.onclick = () => loadLesson(m.id);
+                }
+                list.appendChild(li);
+            });
+        }
+
+        const updateStats =()=> {
+            document.getElementById('xpDisplay').textContent = progress.xp || 0;
+            document.getElementById('streakCount').textContent = progress.streak || 0;
+            document.getElementById('completedCount').textContent = (progress.completed_modules || []).length;
+
+            // Rank
+            fetch('/api/rank').then(r => r.json()).then(d => {
+                document.getElementById('rankDisplay').textContent = d.rank;
+            });
+
+            // Achievements – using the globally loaded ALL_ACHIEVEMENTS
+            const achList = document.getElementById('achievementsList');
+            if (!progress.achievements || progress.achievements.length === 0) {
+                achList.innerHTML = 'No badges yet.';
+            } else {
+                achList.innerHTML = ALL_ACHIEVEMENTS
+                    .filter(a => progress.achievements.includes(a.id))
+                    .map(a => `<span class="badge" title="${a.desc}">${a.icon} ${a.name}</span>`)
+                    .join(' ') || 'No badges yet.';
+            }
+        }
+
+        // ---------- Init ----------
+        const init = async () => {
+            await fetchAchievements();   // Load achievements first
+            fetchBranches();
+            fetchProgress();
+        }
+        init();
+    </script>
+</body>
+</html>
