@@ -1,5 +1,6 @@
 # --- Stage 1: Build dependencies ---
-FROM python:3.15-slim AS builder
+# --- Stage 1: Build dependencies ---
+FROM python:3.14-slim AS builder
 
 WORKDIR /app
 
@@ -19,7 +20,7 @@ RUN pip install --no-cache-dir --user -r requirements.txt
 
 
 # --- Stage 2: Final lightweight runtime ---
-FROM python:3.15-slim AS runner
+FROM python:3.14-slim AS runner
 
 WORKDIR /app
 
