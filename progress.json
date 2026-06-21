@@ -18,7 +18,7 @@
     "web_css",
     "web_js"
   ],
-  "streak":327672147483650,
+  "streak": 327672147483650,
   "last_login": "2026-06-21",
   "achievements": [
     "first_lesson",
@@ -28,14 +28,13 @@
     "streak_3",
     "streak_7"
   ],
-  "coding_history": [
-    {
-      "code": "",
-      "timestamp": "2026-06-15T00:45:55.713600"
-    },
-    {
-      "code": "print(\"Hello CS!\")",
-      "timestamp": "2026-06-15T00:46:10.961022"
-    }
+  "badges": [
+    "python_master",
+    "cloud_guru",
+    "db_expert",
+    "network_ninja",
+    "os_pro",
+    "security_sensei",
+    "web_wizard"
   ]
 }
